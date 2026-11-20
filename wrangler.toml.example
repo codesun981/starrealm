@@ -12,6 +12,11 @@ type = "Text"
 globs = ["**/*.css"]
 fallthrough = true
 
+[[rules]]
+type = "Data"
+globs = ["**/*.jpg"]
+fallthrough = true
+
 [[d1_databases]]
 binding = "NAV_DB"
 database_name = "book"

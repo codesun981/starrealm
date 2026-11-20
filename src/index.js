@@ -4,6 +4,7 @@ import { handleFrontendRequest } from './frontend/renderer.js';
 import { isAdminAuthenticated, createAdminSession, buildSessionCookie, SESSION_COOKIE_NAME, validateAdminSession, destroyAdminSession, parseCookies } from './admin/auth.js';
 import { validateGateSession, renderGatePage, handleGateLogin, GATE_COOKIE_NAME, buildGateCookie } from './gate.js';
 import { wallpaperResponse } from './wallpaper.js';
+import { logoResponse } from './logo.js';
 
 // 自定义壁纸上传：原始图片字节存 KV（上限 8MB），类型单独存一键。
 async function handleWallpaperUpload(request, env) {
@@ -41,6 +42,9 @@ export default {
     const path = url.pathname;
 
     // 壁纸是公开静态资源（不含任何数据），密码门与后台都不拦它。
+    if (path === '/logo.png') {
+      return logoResponse();
+    }
     if (path === '/wallpaper.jpg') {
       return wallpaperResponse(request, env);
     }

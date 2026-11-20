@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>星境书签</title>
+  <link rel="icon" type="image/png" href="/logo.png">
 <style>
 /* 桌面风前台（fork 重写）：视觉语言借鉴 GlassDesk（MIT）的 Liquid Glass 材质体系：
    壁纸铺满 + 玻璃拟态 + 桌面图标 + Dock。材质变量与其 tokens.css 同源思路。 */
@@ -102,6 +103,10 @@ body::before { content: ''; position: fixed; inset: 0; background: linear-gradie
 .app:hover .app-icon { transform: scale(1.07); }
 .app:active .app-icon { transform: scale(.96); }
 .app-icon img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 17px; }
+.app-icon.has-img .app-letter, .dock-icon.has-img .app-letter { visibility: hidden; }
+.app-icon img.fav, .dock-icon img.fav { object-fit: contain; padding: 15%; background: #f4f5f7; box-sizing: border-box; }
+.brand { display: inline-flex; align-items: center; gap: 6px; }
+.brand-apple { width: 15px; height: 15px; fill: #fff; flex: none; }
 .app-letter { position: absolute; inset: 0; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-size: 27px; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgb(0 0 0 / 30%); }
 .app-badge {
   position: absolute; right: -5px; bottom: -5px; width: 19px; height: 19px; border-radius: 6px; z-index: 2;
@@ -248,7 +253,7 @@ button.tl-close:hover { filter: brightness(1.1); }
 </head>
 <body>
 <header class="menubar glass">
-  <span class="brand">星境</span>
+  <span class="brand"><svg class="brand-apple" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg><span>星境</span></span>
   {{MENU_ITEMS}}
   <span class="spacer"></span>
   <span class="view-toggle" role="group" aria-label="显示模式">
@@ -312,10 +317,15 @@ button.tl-close:hover { filter: brightness(1.1); }
 </div>
 
 <script>
-// 图标加载失败回退：apple-touch-icon → favicon.ico → 露出首字色块。
+// 图标加载成功后藏起首字垫底，避免透明 favicon 与字母重影。
+function iconOk(img) {
+  var p = img.closest('.app-icon, .dock-icon');
+  if (p) p.classList.add('has-img');
+}
+// 图标加载失败回退：apple-touch-icon → favicon.ico（改为白底内嵌）→ 露出首字色块。
 function iconErr(img) {
   var fav = img.getAttribute('data-fav');
-  if (fav && img.src !== fav) { img.src = fav; return; }
+  if (fav && !img.dataset.favTried) { img.dataset.favTried = '1'; img.classList.add('fav'); img.src = fav; return; }
   img.remove();
 }
 

@@ -60,7 +60,7 @@ export function renderGatePage(error = '') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>星境书签 · 需要密码</title>
+<title>星境书签 · 需要密码</title><link rel="icon" type="image/png" href="/logo.png">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -83,6 +83,7 @@ export function renderGatePage(error = '') {
 </head>
 <body>
   <form class="card" method="POST" action="/gate">
+    <img src="/logo.png" alt="" style="width:54px;height:54px;border-radius:13px;display:block;margin:0 auto 12px">
     <h1>星境书签</h1>
     <p class="sub">这是私人书签页，输入访问密码继续。</p>
     ${errorHtml}

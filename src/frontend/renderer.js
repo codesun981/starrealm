@@ -105,8 +105,9 @@ function buildIconTile(site, options = {}) {
   const faviconSrc = origin ? `${origin}/favicon.ico` : '';
   const initial = escapeHTML((rawName.trim().charAt(0) || '站').toUpperCase());
   const [c1, c2] = gradientFor(rawName);
-  const img = iconSrc
-    ? `<img src="${escapeHTML(iconSrc)}" data-fav="${escapeHTML(faviconSrc)}" alt="" loading="lazy" onerror="iconErr(this)">`
+  const forceLetter = String(site.logo || '').trim().toLowerCase() === 'letter';
+  const img = (!forceLetter && iconSrc)
+    ? `<img src="${escapeHTML(iconSrc)}" data-fav="${escapeHTML(faviconSrc)}" alt="" loading="lazy" onload=\"iconOk(this)\" onerror="iconErr(this)">`
     : '';
   if (options.dock) {
     return `<a class="dock-app" href="${safeUrl}" target="_blank" rel="noopener noreferrer" data-tip="${safeName}" data-name="${safeName}" data-id="${site.id}" data-pinned="${options.pinned ? '1' : '0'}"${options.pinned ? ' draggable="true"' : ''} aria-label="${safeName}">

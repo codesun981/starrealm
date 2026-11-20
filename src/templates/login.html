@@ -16,8 +16,8 @@
           localStorage.setItem('nav-theme', 'dark');
         }
         var root = document.documentElement;
-        // 桌面风改造（fork）：登录页固定深色玻璃主题，与前台保持一致。
-        root.classList.add('dark');
+        // 桌面风改造（fork）：登录页固定 macOS 浅色主题，与前台保持一致。
+        root.classList.remove('dark');
         root.classList.remove('omc', 'cyber');
       } catch (e) {}
     })();
@@ -546,5 +546,12 @@
       }
     })();
   </script>
+<style>
+  body { background: #1c2733 url('/wallpaper.jpg?v=3') center / cover no-repeat fixed !important; }
+  .login-card, .card, .bento-card { background: rgb(255 255 255 / 82%) !important; backdrop-filter: blur(24px) saturate(1.5); border: 1px solid rgb(255 255 255 / 65%) !important; color: #1d1d1f !important; box-shadow: 0 24px 48px -16px rgb(0 0 0 / 35%) !important; }
+  .login-card h1, .login-card h2, .card h1, .card h2 { color: #1d1d1f !important; }
+  .login-card input, .card input { background: #fff !important; border: 1px solid rgb(0 0 0 / 14%) !important; color: #1d1d1f !important; }
+  .blobs, .top-controls { display: none !important; }
+</style>
 </body>
 </html>

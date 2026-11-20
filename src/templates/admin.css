@@ -1425,3 +1425,7 @@ button:disabled { opacity: 0.45; }
 .del-btn, .category-del-btn { background: #ff3b30; color: #fff; border: 1px solid #ff3b30; }
 .del-btn:hover, .category-del-btn:hover { background: #d92b20; border-color: #d92b20; }
 .btn-secondary, .category-reset-btn, #exportBtn, #importBtn, #refreshCategories { background: #e8e8ed; color: #1d1d1f; border: 1px solid rgb(0 0 0 / 5%); }
+
+/* ===== 浅色修正二（fork 追加十四）：embed 权重规则把导航字压成白色，须同权重纠正 ===== */
+html.embed .settings-sidebar .tab-button { color: #3a3a3c; }
+html.embed .settings-sidebar .tab-button.active { color: #1d1d1f; }

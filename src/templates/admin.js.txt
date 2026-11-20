@@ -4,11 +4,6 @@ const nextPageBtn = document.getElementById('nextPage');
 const currentPageSpan = document.getElementById('currentPage');
 const totalPagesSpan = document.getElementById('totalPages');
 
-const pendingTableBody = document.getElementById('pendingTableBody');
-const pendingPrevPageBtn = document.getElementById('pendingPrevPage');
-const pendingNextPageBtn = document.getElementById('pendingNextPage');
-const pendingCurrentPageSpan = document.getElementById('pendingCurrentPage');
-const pendingTotalPagesSpan = document.getElementById('pendingTotalPages');
 
 const messageDiv = document.getElementById('message');
 const categoryTableBody = document.getElementById('categoryTableBody');
@@ -162,10 +157,6 @@ let totalItems = 0;
 let allConfigs = [];
 let currentSearchKeyword = '';
 
-let pendingCurrentPage = 1;
-let pendingPageSize = 10;
-let pendingTotalItems = 0;
-let allPendingConfigs = [];
 let categoriesData = [];
 
 // 创建编辑模态框
@@ -779,102 +770,6 @@ searchInput.addEventListener('input', () => {
   fetchConfigs(currentPage, currentSearchKeyword);
 });
 
-// 进入待审核页或翻页时，加载投稿列表。
-function fetchPendingConfigs(page = pendingCurrentPage) {
-  fetch(`/api/pending?page=${page}&pageSize=${pendingPageSize}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.code === 200) {
-        pendingTotalItems = data.total;
-        pendingCurrentPage = data.page;
-        pendingTotalPagesSpan.innerText = Math.ceil(pendingTotalItems / pendingPageSize);
-        pendingCurrentPageSpan.innerText = pendingCurrentPage;
-        allPendingConfigs = data.data;
-        renderPendingConfig(allPendingConfigs);
-        updatePendingPaginationButtons();
-      } else { showMessage(data.message, 'error'); }
-    }).catch(() => showMessage('网络错误', 'error'));
-}
-
-// 投稿加载完成后，生成待审核表格。
-function renderPendingConfig(configs) {
-  pendingTableBody.innerHTML = '';
-  if (configs.length === 0) {
-    pendingTableBody.innerHTML = '<tr><td colspan="7">没有待审核数据</td></tr>';
-    return;
-  }
-  configs.forEach(config => {
-    const row = document.createElement('tr');
-    const safeName = escapeHTML(config.name || '');
-    const normalizedUrl = normalizeUrl(config.url);
-    const urlCell = normalizedUrl
-      ? `<a href="${escapeHTML(normalizedUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(normalizedUrl)}</a>`
-      : (config.url ? escapeHTML(config.url) : '未提供');
-    const normalizedLogo = normalizeUrl(config.logo);
-    const initial = escapeHTML(((config.name || '站').trim().charAt(0) || '站').toUpperCase());
-    const logoCell = normalizedLogo
-      ? `<div class="site-logo-box"><img src="${escapeHTML(normalizedLogo)}" alt="${safeName}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="site-logo-fallback" style="display:none">${initial}</span></div>`
-      : `<div class="site-logo-box"><span class="site-logo-fallback">${initial}</span></div>`;
-    const descCell = config.desc ? escapeHTML(config.desc) : '<span style="opacity:0.45">暂无描述</span>';
-    const catelogCell = escapeHTML(config.catelog || '');
-    row.innerHTML = `
-      <td class="cell-id">#${config.id}</td>
-      <td class="cell-name" title="${safeName}">${safeName}</td>
-      <td class="cell-url" title="${escapeHTML(config.url || '')}">${urlCell}</td>
-      <td class="cell-logo">${logoCell}</td>
-      <td class="cell-desc" title="${escapeHTML(config.desc || '')}">${descCell}</td>
-      <td class="cell-cat"><span class="cat-badge">${catelogCell}</span></td>
-      <td class="actions">
-        <button class="approve-btn" data-id="${config.id}">批准</button>
-        <button class="reject-btn" data-id="${config.id}">拒绝</button>
-      </td>
-    `;
-    pendingTableBody.appendChild(row);
-  });
-  bindPendingActionEvents();
-}
-
-// 投稿表格重绘后，绑定通过与拒绝操作。
-function bindPendingActionEvents() {
-  document.querySelectorAll('.approve-btn').forEach(btn => {
-    btn.addEventListener('click', function() { handleApprove(this.dataset.id); });
-  });
-  document.querySelectorAll('.reject-btn').forEach(btn => {
-    btn.addEventListener('click', function() { handleReject(this.dataset.id); });
-  });
-}
-
-// 点击通过时，将指定投稿转为正式书签。
-function handleApprove(id) {
-  if (!confirm('确定批准吗？')) return;
-  fetch(`/api/pending/${id}`, { method: 'PUT' })
-    .then(res => res.json())
-    .then(data => {
-      if (data.code === 200) { showMessage('批准成功', 'success'); fetchPendingConfigs(); fetchConfigs(); }
-      else { showMessage(data.message, 'error'); }
-    }).catch(() => showMessage('网络错误', 'error'));
-}
-
-// 点击拒绝时，移除指定投稿。
-function handleReject(id) {
-  if (!confirm('确定拒绝吗？')) return;
-  fetch(`/api/pending/${id}`, { method: 'DELETE' })
-    .then(res => res.json())
-    .then(data => {
-      if (data.code === 200) { showMessage('拒绝成功', 'success'); fetchPendingConfigs(); }
-      else { showMessage(data.message, 'error'); }
-    }).catch(() => showMessage('网络错误', 'error'));
-}
-
-// 投稿列表翻页后，更新分页按钮状态。
-function updatePendingPaginationButtons() {
-  pendingPrevPageBtn.disabled = pendingCurrentPage === 1;
-  pendingNextPageBtn.disabled = pendingCurrentPage >= Math.ceil(pendingTotalItems / pendingPageSize);
-}
-
-pendingPrevPageBtn.addEventListener('click', () => { if (pendingCurrentPage > 1) fetchPendingConfigs(pendingCurrentPage - 1); });
-pendingNextPageBtn.addEventListener('click', () => { if (pendingCurrentPage < Math.ceil(pendingTotalItems / pendingPageSize)) fetchPendingConfigs(pendingCurrentPage + 1); });
-
 // 进入站点设置页时，加载博客与仓库入口配置。
 function fetchSettings() {
   const settingBlogEnabled = document.getElementById('settingBlogEnabled');
@@ -928,5 +823,4 @@ if (settingsForm) {
 }
 
 fetchConfigs();
-fetchPendingConfigs();
 if (categoryTableBody) fetchCategories();

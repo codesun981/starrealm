@@ -62,10 +62,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-4-7 4V5z"/></svg>
             <span>书签列表</span>
           </button>
-          <button class="tab-button" data-tab="pending">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l2.5 2.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>待审核列表</span>
-          </button>
           <button class="tab-button" data-tab="categories">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
             <span>分类管理</span>
@@ -176,33 +172,6 @@
                 <button id="prevPage" disabled>上一页</button>
                 <span class="page-indicator">第 <span id="currentPage">1</span> / <span id="totalPages">1</span> 页</span>
                 <button id="nextPage" disabled>下一页</button>
-              </div>
-            </div>
-          </div>
-
-          <div id="pending" class="tab-content">
-            <div class="table-wrapper">
-              <div class="table-scroll">
-                <table id="pendingTable">
-                  <thead>
-                    <tr>
-                      <th style="width: 68px;">ID</th>
-                      <th style="width: 180px;">站点名称</th>
-                      <th style="width: 240px;">网址链接</th>
-                      <th style="width: 64px;">图标</th>
-                      <th>站点描述</th>
-                      <th style="width: 120px;">所属分类</th>
-                      <th style="width: 140px;">操作</th>
-                    </tr>
-                  </thead>
-                  <tbody id="pendingTableBody">
-                  </tbody>
-                </table>
-              </div>
-              <div class="pagination">
-                <button id="pendingPrevPage" disabled>上一页</button>
-                <span class="page-indicator">第 <span id="pendingCurrentPage">1</span> / <span id="pendingTotalPages">1</span> 页</span>
-                <button id="pendingNextPage" disabled>下一页</button>
               </div>
             </div>
           </div>

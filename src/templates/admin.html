@@ -158,33 +158,13 @@
           </div>
 
           <div id="categories" class="tab-content">
-            <div class="table-wrapper">
-              <div class="category-toolbar">
-                <div class="category-create-bar">
-                  <input type="text" id="newCategoryName" placeholder="输入新分类名称 (如：开发工具)" maxlength="50">
-                  <input type="number" id="newCategorySort" placeholder="排序权重 (默认 9999)">
-                  <button type="button" id="createCategoryBtn" class="category-create-btn">+ 创建分类</button>
-                </div>
-                <div class="category-hint-row">
-                  <button id="refreshCategories" type="button" class="btn-secondary">刷新列表</button>
-                </div>
-              </div>
-              <div class="table-scroll">
-                <table id="categoryTable">
-                  <thead>
-                    <tr>
-                      <th style="width: 240px;">分类名称</th>
-                      <th style="width: 140px;">关联书签数</th>
-                      <th style="width: 260px;">排序权重</th>
-                      <th>操作</th>
-                    </tr>
-                  </thead>
-                  <tbody id="categoryTableBody">
-                    <tr><td colspan="4">加载中...</td></tr>
-                  </tbody>
-                </table>
-              </div>
+            <div class="cat-toolbar">
+              <input type="text" id="newCategoryName" placeholder="输入新分类名称 (如：开发工具)" maxlength="50">
+              <input type="number" id="newCategorySort" placeholder="排序权重 (默认 9999)">
+              <button type="button" id="createCategoryBtn" class="category-create-btn">+ 创建分类</button>
+              <button id="refreshCategories" type="button" class="btn-secondary cat-refresh">刷新列表</button>
             </div>
+            <div id="categoryList" class="bm-list"></div>
           </div>
 
           <div id="appearance" class="tab-content">

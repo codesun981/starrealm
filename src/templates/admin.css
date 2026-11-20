@@ -1356,3 +1356,21 @@ html.dark .settings-actions { margin-top: 14px; display: flex; justify-content: 
 /* ===== 品牌徽标（fork 追加十）：博客 logo 图填满徽标框 ===== */
 .brand-badge { padding: 0; overflow: hidden; background: none; }
 .brand-badge img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ===== 侧栏去底板 + 分类行式（fork 追加十一，对齐 GlassDesk 扁平侧栏） ===== */
+html.dark .settings-sidebar .tab-buttons { background: transparent; border: none; box-shadow: none; padding: 0; border-radius: 0; }
+.settings-sidebar .sidebar-footer button,
+html.dark #exportBtn, html.dark #importBtn { height: 30px; font-size: 12px; border-radius: 8px; background: rgb(255 255 255 / 6%); }
+.cat-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.cat-toolbar input[type="text"] { flex: 1; min-width: 180px; }
+.cat-toolbar input[type="number"] { width: 170px; flex: none; }
+.cat-toolbar .cat-refresh { margin-left: auto; }
+.cat-row { position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 15px; }
+.cat-row + .cat-row::before { content: ''; position: absolute; top: 0; left: 15px; right: 15px; height: 1px; background: rgb(255 255 255 / 7%); }
+.cat-row:hover { background: rgb(255 255 255 / 3%); }
+.cat-main { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 9px; }
+.cat-name { font-size: 12.5px; font-weight: 540; color: #f4f5f7; }
+.cat-count { font-size: 11px; color: #8f939e; }
+.cat-side { display: flex; align-items: center; gap: 6px; flex: none; }
+.cat-order-label { font-size: 11px; color: #8f939e; margin-right: 2px; }
+.cat-side .category-sort-input { width: 68px; height: 30px; text-align: center; }

@@ -6,7 +6,7 @@ const totalPagesSpan = document.getElementById('totalPages');
 
 
 const messageDiv = document.getElementById('message');
-const categoryTableBody = document.getElementById('categoryTableBody');
+const categoryTableBody = document.getElementById('categoryList');
 const refreshCategoriesBtn = document.getElementById('refreshCategories');
 
 // 转义与网址校验由静态资源路由注入，共用 src/utils/html.js 的实现。
@@ -438,7 +438,7 @@ if (addCatelog) {
 // 进入分类页或更新分类后，重新加载分类数据。
 function fetchCategories(preferredSelectedCategory) {
   if (categoryTableBody) {
-    categoryTableBody.innerHTML = '<tr><td colspan="4">加载中...</td></tr>';
+    categoryTableBody.innerHTML = '<div class="bm-empty">加载中...</div>';
   }
   fetch('/api/categories')
     .then(res => res.json())
@@ -454,11 +454,11 @@ function fetchCategories(preferredSelectedCategory) {
         }
       } else {
         showMessage(data.message || '加载分类失败', 'error');
-        if (categoryTableBody) categoryTableBody.innerHTML = '<tr><td colspan="4">加载失败</td></tr>';
+        if (categoryTableBody) categoryTableBody.innerHTML = '<div class="bm-empty">加载失败</div>';
       }
     }).catch(() => {
       showMessage('网络错误', 'error');
-      if (categoryTableBody) categoryTableBody.innerHTML = '<tr><td colspan="4">加载失败</td></tr>';
+      if (categoryTableBody) categoryTableBody.innerHTML = '<div class="bm-empty">加载失败</div>';
     });
 }
 
@@ -467,54 +467,54 @@ function renderCategories(categories) {
   if (!categoryTableBody) return;
   categoryTableBody.innerHTML = '';
   if (!categories || categories.length === 0) {
-    categoryTableBody.innerHTML = '<tr><td colspan="4">暂无分类数据</td></tr>';
+    categoryTableBody.innerHTML = '<div class="bm-empty">暂无分类数据</div>';
     return;
   }
 
+  const card = document.createElement('section');
+  card.className = 'bm-group';
   categories.forEach(item => {
-    const row = document.createElement('tr');
+    const row = document.createElement('div');
+    row.className = 'cat-row';
 
-    const nameCell = document.createElement('td');
-    nameCell.textContent = item.catelog;
-    row.appendChild(nameCell);
+    const main = document.createElement('div');
+    main.className = 'cat-main';
+    const nameEl = document.createElement('span');
+    nameEl.className = 'cat-name';
+    nameEl.textContent = item.catelog;
+    const countEl = document.createElement('span');
+    countEl.className = 'cat-count';
+    countEl.textContent = item.site_count + ' 个书签';
+    main.appendChild(nameEl);
+    main.appendChild(countEl);
+    row.appendChild(main);
 
-    const countCell = document.createElement('td');
-    countCell.textContent = item.site_count;
-    row.appendChild(countCell);
-
-    const sortCell = document.createElement('td');
+    const side = document.createElement('div');
+    side.className = 'cat-side';
+    const orderLabel = document.createElement('span');
+    orderLabel.className = 'cat-order-label';
+    orderLabel.textContent = '排序';
+    side.appendChild(orderLabel);
     const input = document.createElement('input');
     input.type = 'number';
     input.className = 'category-sort-input';
     if (item.explicit) { input.value = item.sort_order; }
     else { input.placeholder = item.sort_order; }
     input.setAttribute('data-category', item.catelog);
-    sortCell.appendChild(input);
-
-    const hint = document.createElement('small');
-    hint.textContent = '默认：' + item.sort_order;
-    hint.style.display = 'block';
-    hint.style.marginTop = '4px';
-    hint.style.fontSize = '0.75rem';
-    hint.style.color = '#6c757d';
-    sortCell.appendChild(hint);
-    row.appendChild(sortCell);
-
-    const actionCell = document.createElement('td');
-    actionCell.className = 'category-actions';
+    side.appendChild(input);
 
     const saveBtn = document.createElement('button');
     saveBtn.className = 'category-save-btn';
     saveBtn.textContent = '保存';
     saveBtn.setAttribute('data-category', item.catelog);
-    actionCell.appendChild(saveBtn);
+    side.appendChild(saveBtn);
 
     const resetBtn = document.createElement('button');
     resetBtn.className = 'category-reset-btn';
     resetBtn.textContent = '重置';
     resetBtn.setAttribute('data-category', item.catelog);
     if (!item.explicit) resetBtn.disabled = true;
-    actionCell.appendChild(resetBtn);
+    side.appendChild(resetBtn);
 
     const delBtn = document.createElement('button');
     delBtn.className = 'category-del-btn';
@@ -524,11 +524,12 @@ function renderCategories(categories) {
       delBtn.disabled = true;
       delBtn.title = `该分类下有 ${item.site_count} 个书签，不可直接删除`;
     }
-    actionCell.appendChild(delBtn);
+    side.appendChild(delBtn);
 
-    row.appendChild(actionCell);
-    categoryTableBody.appendChild(row);
+    row.appendChild(side);
+    card.appendChild(row);
   });
+  categoryTableBody.appendChild(card);
 
   bindCategoryEvents();
 }
@@ -539,7 +540,7 @@ function bindCategoryEvents() {
   categoryTableBody.querySelectorAll('.category-save-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const category = this.getAttribute('data-category');
-      const input = this.closest('tr').querySelector('.category-sort-input');
+      const input = this.closest('.cat-row').querySelector('.category-sort-input');
       if (!category || !input) return;
       const rawValue = input.value.trim();
       if (rawValue === '') { showMessage('请输入排序值，或使用"重置"恢复默认。', 'error'); return; }

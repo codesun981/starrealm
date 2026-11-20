@@ -1254,3 +1254,9 @@ html.embed .container {
   background: rgb(22 25 32 / 42%);
 }
 html.embed .windowbar { display: none; }
+
+/* ===== 嵌入模式对比度（fork 追加）：亮壁纸上加深玻璃、提亮文字 ===== */
+html.embed .container { background: rgb(16 18 24 / 68%); }
+html.embed .settings-sidebar { background: rgb(0 0 0 / 22%); }
+html.embed .settings-sidebar .tab-button { color: #e8eaf0; }
+html.embed .table-wrapper { background: rgb(10 12 16 / 34%); }

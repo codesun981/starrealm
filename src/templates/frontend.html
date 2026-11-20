@@ -453,8 +453,15 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !s
   });
   swBar.addEventListener('pointermove', function (e) {
     if (!drag) return;
-    settingsWindow.style.left = Math.min(Math.max(e.clientX - drag.dx, -settingsWindow.offsetWidth + 120), window.innerWidth - 120) + 'px';
-    settingsWindow.style.top = Math.min(Math.max(e.clientY - drag.dy, 0), window.innerHeight - 60) + 'px';
+    // 钳制在视口内：标题栏至少留 260px 横向可见、纵向完整可见，窗口拖不丢。
+    var w = settingsWindow.offsetWidth;
+    settingsWindow.style.left = Math.min(Math.max(e.clientX - drag.dx, -w + 260), window.innerWidth - 260) + 'px';
+    settingsWindow.style.top = Math.min(Math.max(e.clientY - drag.dy, 0), window.innerHeight - 42) + 'px';
+  });
+  swBar.addEventListener('dblclick', function (e) {
+    if (e.target.closest('.tl-close')) return;
+    settingsWindow.classList.remove('dragged');
+    settingsWindow.style.left = ''; settingsWindow.style.top = '';
   });
   swBar.addEventListener('pointerup', function () { drag = null; });
   swBar.addEventListener('pointercancel', function () { drag = null; });

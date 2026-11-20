@@ -273,13 +273,16 @@
   </div>
   <script src="/static/admin.js"></script>
   <script>
-    // 内容区大标题跟随左侧栏选中项（fork 新增，仅展示同步）。
+    // 内容区大标题跟随左侧栏选中项（fork 新增，仅展示同步）；
+    // 搜索与新增只属于书签列表，其余分区隐藏工具栏，免得设置页顶着无关控件。
     (function () {
       var title = document.getElementById('mainTabTitle');
+      var toolbar = document.getElementById('toolbarRight');
       document.querySelectorAll('.tab-button').forEach(function (btn) {
         btn.addEventListener('click', function () {
           var span = btn.querySelector('span');
           if (title && span) title.textContent = span.textContent;
+          if (toolbar) toolbar.style.display = btn.getAttribute('data-tab') === 'config' ? '' : 'none';
         });
       });
     })();

@@ -613,3 +613,9 @@ dock.addEventListener('mouseleave', function () {
   #settingsWindow .sw-bar { background: rgb(255 255 255 / 55%); border-bottom: 1px solid rgb(0 0 0 / 8%); }
   #settingsWindow .sw-title { color: rgb(60 60 67 / 85%); }
 </style>
+
+<style>
+  /* 卡片模式：苹果式大 R 角（连续圆角观感），图标内角同比例放大 */
+  body[data-view="card"] .app { border-radius: 22px; }
+  body[data-view="card"] .app-icon, body[data-view="card"] .app-letter, body[data-view="card"] .app-icon img { border-radius: 14px; }
+</style>

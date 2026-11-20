@@ -207,6 +207,9 @@ body[data-view="card"] .app-domain { font-size: 11px; color: var(--ink-3); white
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 14px; border-bottom: 1px solid rgb(255 255 255 / 8%);
   cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none;
+  /* 与窗内后台同色的近实色标题栏，避免壁纸透进来显得斑驳 */
+  background: rgb(32 32 34 / 97%);
+  border-radius: 21px 21px 0 0;
 }
 .sw-bar:active { cursor: grabbing; }
 .traffic-lights { display: flex; gap: 8px; align-items: center; width: 60px; }

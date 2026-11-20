@@ -1295,3 +1295,9 @@ html.dark tbody td { background: transparent !important; border-bottom: 1px soli
 html.dark .category-group-row td { background: rgb(255 255 255 / 4%) !important; border-bottom: 1px solid rgb(255 255 255 / 5%); }
 html.dark .pagination { background: transparent !important; border-top: 1px solid rgb(255 255 255 / 6%); }
 html.dark .add-panel { background: rgb(44 44 46 / 92%); border: 1px solid rgb(255 255 255 / 6%); box-shadow: none; }
+
+/* ===== 整体感补强（fork 追加六）：作用域抬到 .table-wrapper 内，压过上游同名规则 ===== */
+html.dark .table-wrapper thead th { background: transparent !important; }
+html.dark .table-wrapper .category-group-row td { background: rgb(255 255 255 / 4%) !important; }
+html.dark .table-wrapper .category-chip { background: rgb(255 255 255 / 9%); border-color: transparent; }
+html.dark .table-wrapper .pagination { background: transparent !important; }

@@ -47,5 +47,5 @@ export function handleStatic(request) {
 
   const file = files[filePath];
   if (!file) return new Response('资源不存在', { status: 404 });
-  return new Response(file.content, { headers: { 'Content-Type': file.type } });
+  return new Response(file.content, { headers: { 'Content-Type': file.type, 'Cache-Control': 'no-store' } });
 }

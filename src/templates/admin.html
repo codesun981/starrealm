@@ -95,7 +95,10 @@
 
       <main class="settings-main">
         <div class="control-bar">
-          <div class="main-tab-title" id="mainTabTitle">书签列表</div>
+          <div class="head-text">
+            <div class="main-tab-title" id="mainTabTitle">书签列表</div>
+            <p class="main-tab-sub" id="mainTabSub">管理全部书签的排序、分类与显示。</p>
+          </div>
           <div class="toolbar-right" id="toolbarRight">
             <button type="button" id="toggleAddPanelBtn" class="btn-primary-action">
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
@@ -265,11 +268,19 @@
     // 搜索与新增只属于书签列表，其余分区隐藏工具栏，免得设置页顶着无关控件。
     (function () {
       var title = document.getElementById('mainTabTitle');
+      var sub = document.getElementById('mainTabSub');
       var toolbar = document.getElementById('toolbarRight');
+      var SUBS = {
+        config: '管理全部书签的排序、分类与显示。',
+        categories: '新建、改名与调整分类的顺序。',
+        settings: '侧边栏、博客与仓库入口的开关。',
+        appearance: '桌面壁纸，保存在 Cloudflare KV 中。'
+      };
       document.querySelectorAll('.tab-button').forEach(function (btn) {
         btn.addEventListener('click', function () {
           var span = btn.querySelector('span');
           if (title && span) title.textContent = span.textContent;
+          if (sub) sub.textContent = SUBS[btn.getAttribute('data-tab')] || '';
           if (toolbar) toolbar.style.display = btn.getAttribute('data-tab') === 'config' ? '' : 'none';
         });
       });

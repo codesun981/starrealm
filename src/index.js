@@ -5,6 +5,21 @@ import { isAdminAuthenticated } from './admin/auth.js';
 import { validateGateSession, renderGatePage, handleGateLogin } from './gate.js';
 import { wallpaperResponse } from './wallpaper.js';
 
+// 自定义壁纸上传：原始图片字节存 KV（上限 8MB），类型单独存一键。
+async function handleWallpaperUpload(request, env) {
+  const ct = (request.headers.get('Content-Type') || '').split(';')[0].trim();
+  if (!/^image\/(jpeg|png|webp|avif)$/.test(ct)) {
+    return new Response(JSON.stringify({ error: 'unsupported image type' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+  const buf = await request.arrayBuffer();
+  if (!buf || buf.byteLength === 0 || buf.byteLength > 8 * 1024 * 1024) {
+    return new Response(JSON.stringify({ error: 'image empty or too large' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+  await env.NAV_AUTH.put('wallpaper_custom', buf);
+  await env.NAV_AUTH.put('wallpaper_custom_ct', ct);
+  return new Response(JSON.stringify({ ok: true, size: buf.byteLength }), { headers: { 'Content-Type': 'application/json' } });
+}
+
 // 把书签钉到 Dock 或取消钉住，状态存 sites.in_dock，桌面与 Dock 渲染时读取。
 async function handleDockToggle(request, env) {
   let body;
@@ -27,7 +42,7 @@ export default {
 
     // 壁纸是公开静态资源（不含任何数据），密码门与后台都不拦它。
     if (path === '/wallpaper.jpg') {
-      return wallpaperResponse();
+      return wallpaperResponse(request, env);
     }
     // 密码门入口本身与后台登录互不依赖，后台始终走自己的管理员认证。
     if (path === '/gate') {
@@ -55,6 +70,15 @@ export default {
     // Dock 钉住开关（fork 新增）：前台拖拽调用，门会话或管理员会话均可。
     if (path === '/api/dock' && request.method === 'POST') {
       return handleDockToggle(request, env);
+    }
+    // 自定义壁纸（fork 新增）：POST 上传图片存 KV，DELETE 恢复默认壁纸。
+    if (path === '/api/wallpaper' && request.method === 'POST') {
+      return handleWallpaperUpload(request, env);
+    }
+    if (path === '/api/wallpaper' && request.method === 'DELETE') {
+      await env.NAV_AUTH.delete('wallpaper_custom');
+      await env.NAV_AUTH.delete('wallpaper_custom_ct');
+      return new Response(JSON.stringify({ ok: true, reset: true }), { headers: { 'Content-Type': 'application/json' } });
     }
     if (path.startsWith('/api')) {
       return handleApiRequest(request, env, ctx);

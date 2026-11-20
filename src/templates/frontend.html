@@ -461,7 +461,10 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !s
 })();
 
 function applyWallpaper() {
-  document.body.style.backgroundImage = "url('/wallpaper.jpg?t=" + Date.now() + "')";
+  // 先预加载新壁纸，加载完成才替换，避免关窗时背景黑闪
+  var img = new Image();
+  img.onload = function () { document.body.style.backgroundImage = "url('" + img.src + "')"; };
+  img.src = '/wallpaper.jpg?t=' + Date.now();
 }
 
 // 显示模式（图标/卡片），本地记住选择

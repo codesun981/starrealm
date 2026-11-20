@@ -303,7 +303,7 @@ button.tl-close:hover { filter: brightness(1.1); }
     <span class="sw-title">设置</span>
     <span class="sw-spacer" aria-hidden="true"></span>
   </div>
-  <iframe id="settingsFrame" title="豆豆设置" src="about:blank"></iframe>
+  <iframe id="settingsFrame" title="豆豆设置" src="about:blank" style="background:#f5f5f7"></iframe>
 </div>
 
 <div class="dock-wrap">
@@ -428,16 +428,43 @@ note.addEventListener('input', function () {
 var settingsWindow = document.getElementById('settingsWindow');
 var settingsFrame = document.getElementById('settingsFrame');
 var swBar = document.getElementById('swBar');
-function openSettings() {
-  settingsFrame.src = '/admin?embed=1';
+// 设置页只加载一次并常驻 iframe：首次打开等加载完再露窗，之后秒开；
+// 关窗不再清空 iframe（旧逻辑每次冷加载，首帧是后台页的深色底 → 黑闪）。
+var swLoaded = false;
+settingsFrame.addEventListener('load', function () {
+  if (settingsFrame.src.indexOf('/admin') !== -1) swLoaded = true;
+});
+// 桌面打开后空闲时预热设置页，第一次点齿轮也能秒开。
+window.addEventListener('load', function () {
+  setTimeout(function () {
+    if (!swLoaded && settingsFrame.src.indexOf('/admin') === -1) settingsFrame.src = '/admin?embed=1';
+  }, 1200);
+});
+function revealSettings() {
   settingsWindow.hidden = false;
   settingsWindow.classList.remove('opening');
   void settingsWindow.offsetWidth;
   settingsWindow.classList.add('opening');
 }
+function openSettings() {
+  if (swLoaded) {
+    revealSettings();
+    try {
+      var w = settingsFrame.contentWindow;
+      if (w && typeof w.fetchConfigs === 'function') w.fetchConfigs();
+      if (w && typeof w.fetchCategories === 'function') w.fetchCategories();
+    } catch (e) {}
+    return;
+  }
+  settingsFrame.src = '/admin?embed=1';
+  var tries = 0;
+  var timer = setInterval(function () {
+    tries++;
+    if (swLoaded || tries > 40) { clearInterval(timer); revealSettings(); }
+  }, 50);
+}
 function closeSettings() {
   settingsWindow.hidden = true;
-  settingsFrame.src = 'about:blank';
   applyWallpaper();
 }
 document.addEventListener('click', function (e) {

@@ -1,7 +1,7 @@
 import { handleApiRequest } from './api/router.js';
 import { handleAdminRequest } from './admin/router.js';
 import { handleFrontendRequest } from './frontend/renderer.js';
-import { isAdminAuthenticated } from './admin/auth.js';
+import { isAdminAuthenticated, createAdminSession, buildSessionCookie, SESSION_COOKIE_NAME } from './admin/auth.js';
 import { validateGateSession, renderGatePage, handleGateLogin } from './gate.js';
 import { wallpaperResponse } from './wallpaper.js';
 
@@ -50,6 +50,20 @@ export default {
       return renderGatePage();
     }
     if (path === '/admin' || path === '/admin/logout' || path.startsWith('/static')) {
+      // 已过整站密码门即等同管理员（fork 调整，用户要求免二次登录）：
+      // 没有管理员会话时自动签发一个，并把 Cookie 写回浏览器，后续请求自然带上。
+      if (path !== '/admin/logout'
+        && await validateGateSession(request, env)
+        && !(await isAdminAuthenticated(request, env))) {
+        const token = await createAdminSession(env);
+        const headers = new Headers(request.headers);
+        const cookie = headers.get('Cookie') || '';
+        headers.set('Cookie', (cookie ? cookie + '; ' : '') + SESSION_COOKIE_NAME + '=' + token);
+        const res = await handleAdminRequest(new Request(request, { headers }), env, ctx);
+        const out = new Response(res.body, res);
+        out.headers.append('Set-Cookie', buildSessionCookie(token));
+        return out;
+      }
       return handleAdminRequest(request, env, ctx);
     }
 

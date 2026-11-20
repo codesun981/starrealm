@@ -1131,7 +1131,7 @@ html.omc .cat-badge {
 .admin-blobs { display: none !important; }
 html.dark { --primary: #0a84ff; --primary-hover: #409cff; }
 html.dark body {
-  background: #0a1128 url('/wallpaper.jpg') center / cover no-repeat fixed !important;
+  background: #0a1128 url('/wallpaper.jpg?v=3') center / cover no-repeat fixed !important;
   color: #e6e9f2;
 }
 html.dark .container {

@@ -65,7 +65,7 @@ export function renderGatePage(error = '') {
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { min-height: 100vh; display: flex; align-items: center; justify-content: center;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #0a1128 url('/wallpaper.jpg') center / cover no-repeat fixed; color: #e6e9f2; padding: 24px; }
+    background: #0a1128 url('/wallpaper.jpg?v=3') center / cover no-repeat fixed; color: #e6e9f2; padding: 24px; }
   .card { width: 100%; max-width: 360px; background: rgb(22 25 32 / 52%);
     -webkit-backdrop-filter: blur(32px) saturate(1.8); backdrop-filter: blur(32px) saturate(1.8);
     border: 1px solid rgba(255,255,255,0.16); border-radius: 20px; padding: 32px 28px;

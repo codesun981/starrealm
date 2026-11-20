@@ -14,10 +14,11 @@ export async function wallpaperResponse(request, env) {
   } catch (e) {
     console.error('读取自定义壁纸失败，回退默认壁纸', e);
   }
+  // 默认壁纸也只短缓存：曾用 immutable 长缓存，导致换自定义壁纸后浏览器长期显示旧图。
   return new Response(wallpaperData, {
     headers: {
       'Content-Type': 'image/jpeg',
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Cache-Control': 'public, max-age=3600',
     },
   });
 }

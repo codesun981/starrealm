@@ -1166,3 +1166,59 @@ html.dark .modal-content {
   backdrop-filter: blur(32px) saturate(1.8);
   border: 1px solid rgb(255 255 255 / 16%); border-radius: 18px;
 }
+
+/* ===== macOS 设置式布局（fork 追加）：窗口栏 + 左侧栏 + 右侧内容 ===== */
+.container { padding: 0 !important; }
+.windowbar {
+  position: relative; height: 46px; flex: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 14px; border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+.traffic-lights { display: flex; gap: 8px; align-items: center; }
+.tl { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.tl-close { background: #ff5f57; box-shadow: inset 0 0 2px rgb(0 0 0 / 25%); }
+.tl-min { background: #febc2e; }
+.tl-max { background: #28c840; }
+.windowbar-title {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 13px; font-weight: 600; color: #c6c9d1; letter-spacing: .02em;
+}
+.windowbar-actions { display: flex; align-items: center; gap: 8px; }
+.windowbar-actions .home-link-btn, .windowbar-actions .logout-btn { height: 28px; font-size: 12px; padding: 0 10px; }
+.settings-body-grid { display: flex; flex: 1; min-height: 0; }
+.settings-sidebar {
+  width: 214px; flex: none; display: flex; flex-direction: column; gap: 14px;
+  padding: 14px 10px; border-right: 1px solid rgb(255 255 255 / 8%);
+  background: rgb(255 255 255 / 3%);
+}
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 2px 8px 4px; }
+.sidebar-brand .brand-badge { background: #0a84ff; box-shadow: 0 2px 8px rgb(10 132 255 / 40%); }
+.sb-name { font-size: 13.5px; font-weight: 600; color: #f4f5f7; line-height: 1.25; }
+.sb-meta { font-size: 11px; color: #9aa0ae; }
+.settings-sidebar .tab-buttons {
+  display: flex; flex-direction: column; gap: 2px;
+  background: transparent; border: none; padding: 0; border-radius: 0;
+}
+.settings-sidebar .tab-button {
+  height: 32px; width: 100%; justify-content: flex-start; gap: 8px;
+  padding: 0 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #c6c9d1;
+}
+.settings-sidebar .tab-button:hover { background: rgb(255 255 255 / 6%); color: #fff; }
+.settings-sidebar .tab-button.active { background: rgb(255 255 255 / 13%); color: #fff; box-shadow: none; }
+.settings-sidebar .tab-button svg { flex: none; opacity: .8; }
+.settings-sidebar .tab-button.active svg { color: #409cff; opacity: 1; }
+.sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+.sidebar-footer .import-export { display: flex; gap: 8px; }
+.sidebar-footer .import-export button { flex: 1; }
+.sidebar-footer .theme-toggle-btn { display: none !important; }
+.settings-main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 16px 20px; overflow: hidden; }
+.main-tab-title { font-size: 20px; font-weight: 700; color: #f4f5f7; letter-spacing: -.01em; }
+.settings-main .table-wrapper { border-radius: 16px; }
+@media (max-width: 860px) {
+  .settings-body-grid { flex-direction: column; }
+  .settings-sidebar { width: auto; flex-direction: row; flex-wrap: wrap; align-items: center; border-right: none; border-bottom: 1px solid rgb(255 255 255 / 8%); }
+  .settings-sidebar .tab-buttons { flex-direction: row; flex-wrap: wrap; }
+  .settings-sidebar .tab-button { width: auto; }
+  .sidebar-footer { margin: 0; }
+  .settings-main { padding: 12px; }
+}

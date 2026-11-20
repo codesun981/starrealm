@@ -1283,3 +1283,4 @@ html.embed #configTable th:nth-child(7) { width: 62px !important; }
 html.embed #configTable th:nth-child(8) { width: 128px !important; }
 html.embed #pendingTable th:nth-child(6) { width: 100px !important; }
 html.embed #pendingTable th:nth-child(7) { width: 132px !important; }
+html.embed #configTable, html.embed #pendingTable { table-layout: fixed; width: 100%; }

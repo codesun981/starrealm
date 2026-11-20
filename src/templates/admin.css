@@ -1415,3 +1415,13 @@ button:disabled { opacity: 0.45; }
 .settings-wrapper { background: transparent; border: none; box-shadow: none; padding: 0; }
 .wp-preview { border: 1px solid rgb(0 0 0 / 8%); }
 .settings-title { color: #1d1d1f; }
+
+/* ===== 浅色修正（fork 追加十三）：容器类名是 .container，且 embed 规则权重更高 ===== */
+.container, html.embed .container { background: rgb(245 245 247 / 96%); border: 1px solid rgb(0 0 0 / 10%); color: #1d1d1f; box-shadow: 0 24px 48px -16px rgb(0 0 0 / 30%); backdrop-filter: blur(28px) saturate(1.6); -webkit-backdrop-filter: blur(28px) saturate(1.6); }
+.settings-sidebar, html.embed .settings-sidebar { background: rgb(230 230 235 / 65%); border-right: 1px solid rgb(0 0 0 / 8%); }
+/* 按钮改实心填充（macOS 风）：编辑=蓝填充白字，删除=红填充白字 */
+.edit-btn, .category-save-btn { background: #0a84ff; color: #fff; border: 1px solid #0a84ff; }
+.edit-btn:hover, .category-save-btn:hover { background: #0077ed; border-color: #0077ed; }
+.del-btn, .category-del-btn { background: #ff3b30; color: #fff; border: 1px solid #ff3b30; }
+.del-btn:hover, .category-del-btn:hover { background: #d92b20; border-color: #d92b20; }
+.btn-secondary, .category-reset-btn, #exportBtn, #importBtn, #refreshCategories { background: #e8e8ed; color: #1d1d1f; border: 1px solid rgb(0 0 0 / 5%); }

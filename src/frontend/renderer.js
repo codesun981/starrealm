@@ -68,8 +68,14 @@ export async function handleFrontendRequest(request, env, ctx) {
     `<button type="button" class="dot${i === 0 ? ' active' : ''}" data-goto="${i}" aria-label="切换到${escapeHTML(cat)}"></button>`
   ).join('');
 
-  const dockSites = byCatalog.get('常用') || [];
-  const dockHtml = dockSites.map(site => buildIconTile(site, { dock: true })).join('');
+  // Dock 构成：“常用”分类（固定成员）+ 任意桌面钉住的书签（in_dock=1，可拖出取消）。
+  const dockSeen = new Set();
+  const dockEntries = [];
+  (byCatalog.get('常用') || []).forEach(site => { dockSeen.add(site.id); dockEntries.push({ site, pinned: false }); });
+  sites.filter(s => s.in_dock).forEach(site => {
+    if (!dockSeen.has(site.id)) { dockSeen.add(site.id); dockEntries.push({ site, pinned: true }); }
+  });
+  const dockHtml = dockEntries.map(({ site, pinned }) => buildIconTile(site, { dock: true, pinned })).join('');
 
   const html = renderTemplate(frontendTemplate, {
     DESKTOPS: desktopsHtml,
@@ -103,14 +109,27 @@ function buildIconTile(site, options = {}) {
     ? `<img src="${escapeHTML(iconSrc)}" data-fav="${escapeHTML(faviconSrc)}" alt="" loading="lazy" onerror="iconErr(this)">`
     : '';
   if (options.dock) {
-    return `<a class="dock-app" href="${safeUrl}" target="_blank" rel="noopener noreferrer" data-tip="${safeName}" data-name="${safeName}" aria-label="${safeName}">
+    return `<a class="dock-app" href="${safeUrl}" target="_blank" rel="noopener noreferrer" data-tip="${safeName}" data-name="${safeName}" data-id="${site.id}" data-pinned="${options.pinned ? '1' : '0'}"${options.pinned ? ' draggable="true"' : ''} aria-label="${safeName}">
       <span class="dock-icon"><span class="app-letter" style="background:linear-gradient(135deg,${c1},${c2})">${initial}</span>${img}</span>
     </a>`;
   }
-  return `<a class="app" href="${safeUrl}" target="_blank" rel="noopener noreferrer" data-name="${safeName}" data-catalog="${safeCatalog}" data-url="${safeUrl}" title="${safeDesc || safeName}">
+  const domain = escapeHTML(extractDomain(url));
+  return `<a class="app" href="${safeUrl}" target="_blank" rel="noopener noreferrer" draggable="true" data-id="${site.id}" data-name="${safeName}" data-catalog="${safeCatalog}" data-url="${safeUrl}" title="${safeDesc || safeName}">
     <span class="app-icon"><span class="app-letter" style="background:linear-gradient(135deg,${c1},${c2})">${initial}</span>${img}<span class="app-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H8M17 7V16"/></svg></span></span>
     <span class="app-name">${safeName}</span>
+    <span class="app-info"><span class="app-title">${safeName}</span><span class="app-desc">${safeDesc || '暂无描述'}</span><span class="app-domain">${domain}</span></span>
   </a>`;
+}
+
+// 从 URL 提取精简域名，卡片模式下展示。
+function extractDomain(urlStr) {
+  if (!urlStr) return '';
+  try {
+    const u = new URL(urlStr);
+    return (u.hostname.replace(/^www\./i, '') || urlStr) + (u.port ? ':' + u.port : '');
+  } catch {
+    return urlStr.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0] || urlStr;
+  }
 }
 
 // 名称哈希取一对固定渐变色（原 Tailwind 调色板的手写等价）。

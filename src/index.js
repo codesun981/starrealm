@@ -5,6 +5,19 @@ import { isAdminAuthenticated } from './admin/auth.js';
 import { validateGateSession, renderGatePage, handleGateLogin } from './gate.js';
 import { wallpaperResponse } from './wallpaper.js';
 
+// 把书签钉到 Dock 或取消钉住，状态存 sites.in_dock，桌面与 Dock 渲染时读取。
+async function handleDockToggle(request, env) {
+  let body;
+  try { body = await request.json(); } catch { body = null; }
+  const id = Number(body && body.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return new Response(JSON.stringify({ error: 'invalid id' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+  const dock = body.dock ? 1 : 0;
+  await env.NAV_DB.prepare('UPDATE sites SET in_dock = ? WHERE id = ?').bind(dock, id).run();
+  return new Response(JSON.stringify({ ok: true, id, dock: Boolean(dock) }), { headers: { 'Content-Type': 'application/json' } });
+}
+
 export default {
   // Worker 收到请求时，按路径交给接口、后台或前台处理。
   // 前台与数据接口先过整站密码门：管理员会话或访客会话任一有效才放行。
@@ -39,6 +52,10 @@ export default {
       return renderGatePage();
     }
 
+    // Dock 钉住开关（fork 新增）：前台拖拽调用，门会话或管理员会话均可。
+    if (path === '/api/dock' && request.method === 'POST') {
+      return handleDockToggle(request, env);
+    }
     if (path.startsWith('/api')) {
       return handleApiRequest(request, env, ctx);
     }

@@ -15,13 +15,9 @@
           localStorage.setItem('nav-style', 'cyber');
           localStorage.setItem('nav-theme', 'dark');
         }
-        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         var root = document.documentElement;
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-          root.classList.add('dark');
-        } else {
-          root.classList.remove('dark');
-        }
+        // 桌面风改造（fork）：后台固定深色玻璃主题，与前台保持一致。
+        root.classList.add('dark');
         root.classList.remove('omc', 'cyber');
         if (savedStyle === 'omc' || savedStyle === 'cyber') {
           root.classList.add(savedStyle);

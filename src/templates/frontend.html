@@ -166,6 +166,36 @@ body.searching .dots { display: none; }
 .dock-admin .dock-icon { background: linear-gradient(160deg, #5b6472, #2c313a); color: #fff; }
 .dock-admin svg { width: 26px; height: 26px; position: relative; z-index: 1; }
 
+/* 显示模式切换（菜单栏右侧小胶囊） */
+.view-toggle { display: inline-flex; background: rgb(255 255 255 / 10%); border: 1px solid rgb(255 255 255 / 12%); border-radius: 999px; padding: 2px; margin-right: 12px; position: relative; z-index: 1; }
+.view-toggle button { appearance: none; border: none; background: transparent; color: var(--ink-2); font: 500 11.5px var(--font-sans); padding: 2.5px 10px; border-radius: 999px; cursor: pointer; }
+.view-toggle button.active { background: rgb(255 255 255 / 88%); color: #14161c; font-weight: 600; }
+
+/* 卡片模式：图标 + 名称 + 描述 + 域名 */
+.app-info { display: none; }
+body[data-view="card"] .desktop .icon-grid,
+body[data-view="card"] .results .icon-grid { grid-template-columns: repeat(auto-fill, minmax(288px, 1fr)); justify-content: start; gap: 14px; }
+body[data-view="card"] .app {
+  flex-direction: row; width: auto; align-items: center; gap: 13px; text-align: left;
+  background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: var(--radius-card);
+  padding: 13px 15px; box-shadow: var(--glass-shadow), var(--glass-inner);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat)); backdrop-filter: blur(var(--blur)) saturate(var(--sat));
+  transition: transform .16s var(--ease-out), background .16s var(--ease-out);
+}
+body[data-view="card"] .app:hover { transform: translateY(-2px); }
+body[data-view="card"] .app-icon { width: 47px; height: 47px; border-radius: 12px; flex: none; }
+body[data-view="card"] .app-letter { border-radius: 12px; font-size: 20px; }
+body[data-view="card"] .app-icon img { border-radius: 12px; }
+body[data-view="card"] .app-name { display: none; }
+body[data-view="card"] .app-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+body[data-view="card"] .app-title { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body[data-view="card"] .app-desc { font-size: 12px; color: var(--ink-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+body[data-view="card"] .app-domain { font-size: 11px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 拖拽中的 Dock 高亮 */
+.dock.drop-hot { outline: 2px dashed rgb(255 255 255 / 65%); outline-offset: 5px; }
+.app.dragging, .dock-app.dragging { opacity: .45; }
+
 @media (max-width: 900px) {
   .widgets { display: none; }
   .desktop { padding: 20px 16px 130px; }
@@ -183,6 +213,9 @@ body.searching .dots { display: none; }
   <span class="brand">星境</span>
   {{MENU_ITEMS}}
   <span class="spacer"></span>
+  <span class="view-toggle" role="group" aria-label="显示模式">
+    <button type="button" id="viewIcon" class="active">图标</button><button type="button" id="viewCard">卡片</button>
+  </span>
   <span class="meta"><span class="dim" id="menuDate"></span><span id="menuClock"></span></span>
 </header>
 
@@ -329,9 +362,86 @@ note.addEventListener('input', function () {
   }, 400);
 });
 
-// Dock 放大效果
+// 显示模式（图标/卡片），本地记住选择
+var viewIconBtn = document.getElementById('viewIcon');
+var viewCardBtn = document.getElementById('viewCard');
+function setView(v) {
+  document.body.setAttribute('data-view', v);
+  viewIconBtn.classList.toggle('active', v === 'icon');
+  viewCardBtn.classList.toggle('active', v === 'card');
+  try { localStorage.setItem('starrealm-view', v); } catch (e) {}
+}
+viewIconBtn.addEventListener('click', function () { setView('icon'); });
+viewCardBtn.addEventListener('click', function () { setView('card'); });
+try { setView(localStorage.getItem('starrealm-view') === 'card' ? 'card' : 'icon'); } catch (e) { setView('icon'); }
+
+// 拖拽钉住：桌面图标拖进 Dock 钉住；Dock 中钉住的图标拖回桌面取消。
 var dock = document.getElementById('dock');
-var dockIcons = Array.prototype.slice.call(dock.querySelectorAll('.dock-icon'));
+var dragCtx = null;
+function postDock(id, dockState) {
+  return fetch('/api/dock', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: Number(id), dock: dockState }),
+  }).then(function (r) { return r.ok; }).catch(function () { return false; });
+}
+function makeDockTile(appEl) {
+  var a = document.createElement('a');
+  a.className = 'dock-app';
+  a.href = appEl.href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  a.setAttribute('data-tip', appEl.getAttribute('data-name') || '');
+  a.setAttribute('data-name', appEl.getAttribute('data-name') || '');
+  a.setAttribute('data-id', appEl.getAttribute('data-id'));
+  a.setAttribute('data-pinned', '1'); a.draggable = true;
+  var icon = document.createElement('span'); icon.className = 'dock-icon';
+  var letter = appEl.querySelector('.app-letter');
+  if (letter) icon.appendChild(letter.cloneNode(true));
+  var img = appEl.querySelector('.app-icon img');
+  if (img) { var c = img.cloneNode(); c.removeAttribute('data-fav'); icon.appendChild(c); }
+  a.appendChild(icon);
+  return a;
+}
+document.addEventListener('dragstart', function (e) {
+  var app = e.target.closest ? e.target.closest('.app, .dock-app') : null;
+  if (!app) return;
+  var fromDock = app.classList.contains('dock-app');
+  if (fromDock && app.getAttribute('data-pinned') !== '1') { e.preventDefault(); return; }
+  dragCtx = { id: app.getAttribute('data-id'), from: fromDock ? 'dock' : 'desktop', el: app };
+  app.classList.add('dragging');
+  try { e.dataTransfer.setData('text/plain', String(dragCtx.id)); e.dataTransfer.effectAllowed = 'copyMove'; } catch (err) {}
+});
+document.addEventListener('dragend', function () {
+  if (dragCtx && dragCtx.el) dragCtx.el.classList.remove('dragging');
+  dock.classList.remove('drop-hot'); dragCtx = null;
+});
+dock.addEventListener('dragover', function (e) {
+  if (dragCtx && dragCtx.from === 'desktop') { e.preventDefault(); dock.classList.add('drop-hot'); }
+});
+dock.addEventListener('dragleave', function () { dock.classList.remove('drop-hot'); });
+dock.addEventListener('drop', function (e) {
+  if (!dragCtx || dragCtx.from !== 'desktop') return;
+  e.preventDefault(); dock.classList.remove('drop-hot');
+  var ctx = dragCtx;
+  postDock(ctx.id, true).then(function (ok) {
+    if (!ok) return;
+    if (dock.querySelector('.dock-app[data-id="' + ctx.id + '"]')) return;
+    dock.insertBefore(makeDockTile(ctx.el), dock.querySelector('.dock-sep'));
+    refreshDockIcons();
+  });
+});
+document.getElementById('stage').addEventListener('dragover', function (e) {
+  if (dragCtx && dragCtx.from === 'dock') e.preventDefault();
+});
+document.getElementById('stage').addEventListener('drop', function (e) {
+  if (!dragCtx || dragCtx.from !== 'dock') return;
+  e.preventDefault();
+  var ctx = dragCtx;
+  postDock(ctx.id, false).then(function (ok) { if (ok) { ctx.el.remove(); refreshDockIcons(); } });
+});
+
+// Dock 放大效果
+var dockIcons = [];
+function refreshDockIcons() { dockIcons = Array.prototype.slice.call(dock.querySelectorAll('.dock-icon')); }
+refreshDockIcons();
 dock.addEventListener('mousemove', function (e) {
   dockIcons.forEach(function (icon) {
     var r = icon.getBoundingClientRect();

@@ -15,17 +15,10 @@
           localStorage.setItem('nav-style', 'cyber');
           localStorage.setItem('nav-theme', 'dark');
         }
-        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         var root = document.documentElement;
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-          root.classList.add('dark');
-        } else {
-          root.classList.remove('dark');
-        }
+        // 桌面风改造（fork）：登录页固定深色玻璃主题，与前台保持一致。
+        root.classList.add('dark');
         root.classList.remove('omc', 'cyber');
-        if (savedStyle === 'omc' || savedStyle === 'cyber') {
-          root.classList.add(savedStyle);
-        }
       } catch (e) {}
     })();
   </script>
@@ -442,6 +435,22 @@
       border-color: var(--omc-accent) !important;
       box-shadow: none !important;
     }
+  </style>
+
+  <style>
+    /* ===== 桌面风换肤（fork 追加）：壁纸 + Liquid Glass ===== */
+    .blobs, .top-controls { display: none !important; }
+    html.dark body { background: #0a1128 url('/wallpaper.jpg') center / cover no-repeat fixed !important; color: #e6e9f2; }
+    html.dark .login-card {
+      background: rgb(22 25 32 / 55%) !important;
+      -webkit-backdrop-filter: blur(32px) saturate(1.8) brightness(1.04);
+      backdrop-filter: blur(32px) saturate(1.8) brightness(1.04);
+      border: 1px solid rgb(255 255 255 / 16%) !important; border-radius: 20px !important;
+      box-shadow: 0 30px 64px -26px rgb(0 0 0 / 74%), inset 0 1px 0 rgb(255 255 255 / 26%) !important;
+      color: #e6e9f2;
+    }
+    html.dark .login-card input { background: rgb(255 255 255 / 7%) !important; border-color: rgb(255 255 255 / 14%) !important; color: #f4f5f7 !important; }
+    html.dark .login-card button[type="submit"], html.dark .login-btn { background: #0a84ff !important; }
   </style>
 </head>
 <body>

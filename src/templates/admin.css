@@ -1126,3 +1126,43 @@ html.omc .cat-badge {
   .toolbar-right { width: 100%; }
   #searchInput { flex: 1; width: auto; }
 }
+
+/* ===== 桌面风换肤（fork 追加）：壁纸 + Liquid Glass，与前台统一 ===== */
+.admin-blobs { display: none !important; }
+html.dark { --primary: #0a84ff; --primary-hover: #409cff; }
+html.dark body {
+  background: #0a1128 url('/wallpaper.jpg') center / cover no-repeat fixed !important;
+  color: #e6e9f2;
+}
+html.dark .container {
+  background: rgb(22 25 32 / 55%);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8) brightness(1.04);
+  backdrop-filter: blur(32px) saturate(1.8) brightness(1.04);
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 20px;
+  box-shadow: 0 30px 64px -26px rgb(0 0 0 / 74%), inset 0 1px 0 rgb(255 255 255 / 26%);
+}
+html.dark .table-wrapper, html.dark .add-new, html.dark .settings-card {
+  background: rgb(255 255 255 / 5%);
+  border-color: rgb(255 255 255 / 12%);
+}
+html.dark input[type="text"], html.dark input[type="number"], html.dark select,
+html.dark .category-sort-input, html.dark #searchInput {
+  background: rgb(255 255 255 / 7%);
+  border-color: rgb(255 255 255 / 14%);
+  color: #f4f5f7;
+}
+html.dark select option { background: #1c202a; color: #f4f5f7; }
+html.dark .tab-buttons { background: rgb(255 255 255 / 8%); border-color: rgb(255 255 255 / 10%); }
+html.dark .tab-button.active { background: rgb(255 255 255 / 90%); color: #14161c; }
+html.dark .logout-btn, html.dark #exportBtn, html.dark #importBtn, html.dark #refreshCategories,
+html.dark .pagination button, html.dark .category-reset-btn, html.dark .home-link-btn,
+html.dark .theme-toggle-btn, html.dark .btn-secondary {
+  background: rgb(255 255 255 / 8%); border-color: rgb(255 255 255 / 14%); color: #c6c9d1;
+}
+html.dark .modal-content {
+  background: rgb(28 31 40 / 92%);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  backdrop-filter: blur(32px) saturate(1.8);
+  border: 1px solid rgb(255 255 255 / 16%); border-radius: 18px;
+}

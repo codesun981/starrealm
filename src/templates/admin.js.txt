@@ -340,6 +340,17 @@ function renderConfig(configs) {
   bindActionEvents();
 }
 
+
+// 渲染后为每行的编辑/删除按钮绑定事件。
+function bindActionEvents() {
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', function() { handleEdit(this.dataset.id); });
+  });
+  document.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', function() { handleDelete(this.dataset.id); });
+  });
+}
+
 // 分类加载后，填充新增或编辑表单中的分类选项。
 function populateCategorySelect(selectElem, selectedValue) {
   if (!selectElem) return;

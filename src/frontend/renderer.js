@@ -84,7 +84,7 @@ export async function handleFrontendRequest(request, env, ctx) {
     DOCK_ITEMS: dockHtml,
     TOTAL_SITES: String(totalSites),
     CATALOG_COUNT: String(catalogs.length),
-    FIRST_DESKTOP: escapeHTML(catalogs[0] || '星境'),
+    FIRST_DESKTOP: escapeHTML(catalogs[0] || '豆豆'),
   });
 
   return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });

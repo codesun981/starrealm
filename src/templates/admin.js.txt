@@ -1,4 +1,4 @@
-const configTableBody = document.getElementById('configTableBody');
+const configTableBody = document.getElementById('configList');
 const prevPageBtn = document.getElementById('prevPage');
 const nextPageBtn = document.getElementById('nextPage');
 const currentPageSpan = document.getElementById('currentPage');
@@ -152,7 +152,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 let currentPage = 1;
-let pageSize = 10;
+let pageSize = 50;
 let totalItems = 0;
 let allConfigs = [];
 let currentSearchKeyword = '';
@@ -271,21 +271,23 @@ function fetchConfigs(page = currentPage, keyword = currentSearchKeyword) {
         allConfigs = data.data;
         renderConfig(allConfigs);
         updatePaginationButtons();
+        const pg = document.getElementById('configPagination');
+        if (pg) pg.style.display = Math.ceil(totalItems / pageSize) <= 1 ? 'none' : '';
       } else {
         showMessage(data.message, 'error');
       }
     }).catch(() => showMessage('网络错误', 'error'));
 }
 
-// 书签加载完成后，按分类生成列表行。
+// 书签加载完成后，按分类生成分组卡片（一类一卡，行间只留内缩发丝线，不用表格）。
 function renderConfig(configs) {
   configTableBody.innerHTML = '';
   if (configs.length === 0) {
-    configTableBody.innerHTML = '<tr><td colspan="8">没有配置数据</td></tr>';
+    configTableBody.innerHTML = '<div class="bm-empty">没有配置数据</div>';
     return;
   }
 
-  // 按分类汇总当前页的书签。
+  // 按分类汇总书签。
   const grouped = new Map();
   configs.forEach(config => {
     const cat = config.catelog || '未分类';
@@ -294,55 +296,48 @@ function renderConfig(configs) {
   });
 
   grouped.forEach((items, cat) => {
-    const headerRow = document.createElement('tr');
-    headerRow.className = 'category-group-row';
-    headerRow.innerHTML = `<td colspan="8"><span class="category-chip">${escapeHTML(cat)}</span><span class="category-count">${items.length} 个书签</span></td>`;
-    configTableBody.appendChild(headerRow);
+    const section = document.createElement('section');
+    section.className = 'bm-group';
+    const head = document.createElement('div');
+    head.className = 'bm-group-head';
+    head.innerHTML = `<span class="bm-group-title">${escapeHTML(cat)}</span><span class="bm-group-count">${items.length} 个书签</span>`;
+    section.appendChild(head);
 
     items.forEach(config => {
-      const row = document.createElement('tr');
+      const row = document.createElement('div');
+      row.className = 'bm-row';
       const safeName = escapeHTML(config.name || '');
       const normalizedUrl = normalizeUrl(config.url);
-      const displayUrl = config.url ? escapeHTML(config.url) : '未提供';
-      const urlCell = normalizedUrl
-        ? `<a href="${escapeHTML(normalizedUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(normalizedUrl)}</a>`
-        : displayUrl;
       const normalizedLogo = normalizeUrl(config.logo);
       const initial = escapeHTML(((config.name || '站').trim().charAt(0) || '站').toUpperCase());
       const logoCell = normalizedLogo
         ? `<div class="site-logo-box"><img src="${escapeHTML(normalizedLogo)}" alt="${safeName}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="site-logo-fallback" style="display:none">${initial}</span></div>`
         : `<div class="site-logo-box"><span class="site-logo-fallback">${initial}</span></div>`;
-      const descCell = config.desc ? escapeHTML(config.desc) : '<span style="opacity:0.45">暂无描述</span>';
-      const catelogCell = escapeHTML(config.catelog || '');
+      let host = '';
+      try { host = normalizedUrl ? new URL(normalizedUrl).hostname : ''; } catch (e) { host = ''; }
+      const subParts = [];
+      if (config.desc) subParts.push(escapeHTML(config.desc));
+      if (host) subParts.push(escapeHTML(host));
+      const sub = subParts.length ? subParts.join(' · ') : '<span style="opacity:0.45">暂无描述</span>';
       const sortValue = config.sort_order === 9999 || config.sort_order === null || config.sort_order === undefined
-        ? '<span class="sort-badge">默认</span>' : `<span class="sort-badge">${escapeHTML(config.sort_order)}</span>`;
+        ? '' : `<span class="sort-badge">${escapeHTML(config.sort_order)}</span>`;
       row.innerHTML = `
-        <td class="cell-id">#${config.id}</td>
-        <td class="cell-name" title="${safeName}">${safeName}</td>
-        <td class="cell-url" title="${displayUrl}">${urlCell}</td>
-        <td class="cell-logo">${logoCell}</td>
-        <td class="cell-desc" title="${escapeHTML(config.desc || '')}">${descCell}</td>
-        <td class="cell-cat"><span class="cat-badge">${catelogCell}</span></td>
-        <td class="cell-sort">${sortValue}</td>
-        <td class="actions">
+        ${logoCell}
+        <div class="bm-main">
+          <div class="bm-name" title="${safeName}">${safeName}</div>
+          <div class="bm-sub">${sub}</div>
+        </div>
+        <div class="bm-side">
+          ${sortValue}
           <button class="edit-btn" data-id="${config.id}">编辑</button>
           <button class="del-btn" data-id="${config.id}">删除</button>
-        </td>
+        </div>
       `;
-      configTableBody.appendChild(row);
+      section.appendChild(row);
     });
+    configTableBody.appendChild(section);
   });
   bindActionEvents();
-}
-
-// 书签列表重绘后，绑定编辑与删除按钮。
-function bindActionEvents() {
-  document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', function() { handleEdit(this.dataset.id); });
-  });
-  document.querySelectorAll('.del-btn').forEach(btn => {
-    btn.addEventListener('click', function() { handleDelete(this.dataset.id); });
-  });
 }
 
 // 分类加载后，填充新增或编辑表单中的分类选项。

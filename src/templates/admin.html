@@ -152,30 +152,11 @@
         <!-- 主内容与表格区 -->
         <div class="tab-wrapper">
           <div id="config" class="tab-content active">
-            <div class="table-wrapper">
-              <div class="table-scroll">
-                <table id="configTable">
-                  <thead>
-                    <tr>
-                      <th style="width: 68px;">ID</th>
-                      <th style="width: 180px;">站点名称</th>
-                      <th style="width: 220px;">网址链接</th>
-                      <th style="width: 64px;">图标</th>
-                      <th>站点描述</th>
-                      <th style="width: 120px;">所属分类</th>
-                      <th style="width: 84px;">排序</th>
-                      <th style="width: 136px;">操作</th>
-                    </tr>
-                  </thead>
-                  <tbody id="configTableBody">
-                  </tbody>
-                </table>
-              </div>
-              <div class="pagination">
-                <button id="prevPage" disabled>上一页</button>
-                <span class="page-indicator">第 <span id="currentPage">1</span> / <span id="totalPages">1</span> 页</span>
-                <button id="nextPage" disabled>下一页</button>
-              </div>
+            <div id="configList" class="bm-list"></div>
+            <div class="pagination bm-pagination" id="configPagination">
+              <button id="prevPage" disabled>上一页</button>
+              <span class="page-indicator">第 <span id="currentPage">1</span> / <span id="totalPages">1</span> 页</span>
+              <button id="nextPage" disabled>下一页</button>
             </div>
           </div>
 

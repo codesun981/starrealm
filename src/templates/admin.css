@@ -1284,3 +1284,14 @@ html.embed #configTable th:nth-child(8) { width: 128px !important; }
 html.embed #pendingTable th:nth-child(6) { width: 100px !important; }
 html.embed #pendingTable th:nth-child(7) { width: 132px !important; }
 html.embed #configTable, html.embed #pendingTable { table-layout: fixed; width: 100%; }
+
+/* ===== macOS 设置风（fork 追加五）：近不透明底色 + 分组列表整体感 ===== */
+html.dark .container, html.embed .container { background: rgb(32 32 34 / 97%); }
+html.dark .settings-sidebar { background: rgb(52 52 54 / 45%); border-right: 1px solid rgb(255 255 255 / 7%); }
+html.dark .table-wrapper { background: rgb(44 44 46 / 92%); border: 1px solid rgb(255 255 255 / 6%); border-radius: 16px; box-shadow: none; overflow-x: hidden; }
+html.dark table { min-width: 0 !important; }
+html.dark thead th { background: transparent !important; color: #9d9da5; font-weight: 500; border-bottom: 1px solid rgb(255 255 255 / 7%); }
+html.dark tbody td { background: transparent !important; border-bottom: 1px solid rgb(255 255 255 / 5%); }
+html.dark .category-group-row td { background: rgb(255 255 255 / 4%) !important; border-bottom: 1px solid rgb(255 255 255 / 5%); }
+html.dark .pagination { background: transparent !important; border-top: 1px solid rgb(255 255 255 / 6%); }
+html.dark .add-panel { background: rgb(44 44 46 / 92%); border: 1px solid rgb(255 255 255 / 6%); box-shadow: none; }

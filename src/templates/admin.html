@@ -11,6 +11,8 @@
         // 桌面风改造（fork）：后台固定深色玻璃主题，与前台保持一致。
         root.classList.add('dark');
         root.classList.remove('omc', 'cyber');
+        // 被前台桌面以悬浮窗嵌入时（?embed=1）隐藏自带窗口栏，外层窗口负责边框与标题栏。
+        if (new URLSearchParams(location.search).has('embed')) root.classList.add('embed');
       } catch (e) {}
     })();
   </script>

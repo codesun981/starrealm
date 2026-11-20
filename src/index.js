@@ -1,8 +1,8 @@
 import { handleApiRequest } from './api/router.js';
 import { handleAdminRequest } from './admin/router.js';
 import { handleFrontendRequest } from './frontend/renderer.js';
-import { isAdminAuthenticated, createAdminSession, buildSessionCookie, SESSION_COOKIE_NAME } from './admin/auth.js';
-import { validateGateSession, renderGatePage, handleGateLogin } from './gate.js';
+import { isAdminAuthenticated, createAdminSession, buildSessionCookie, SESSION_COOKIE_NAME, validateAdminSession, destroyAdminSession, parseCookies } from './admin/auth.js';
+import { validateGateSession, renderGatePage, handleGateLogin, GATE_COOKIE_NAME, buildGateCookie } from './gate.js';
 import { wallpaperResponse } from './wallpaper.js';
 
 // 自定义壁纸上传：原始图片字节存 KV（上限 8MB），类型单独存一键。
@@ -49,20 +49,42 @@ export default {
       if (request.method === 'POST') return handleGateLogin(request, env);
       return renderGatePage();
     }
+    // 退出 = 整站退出（fork 调整）：管理员会话与门会话一并清除，回到密码门。
+    if (path === '/admin/logout' && request.method === 'POST') {
+      try {
+        const { token } = await validateAdminSession(request, env);
+        if (token) await destroyAdminSession(env, token);
+        const cookies = parseCookies(request.headers.get('Cookie') || '');
+        const gateToken = cookies[GATE_COOKIE_NAME];
+        if (gateToken) await env.NAV_AUTH.delete('gate:' + gateToken);
+      } catch (e) {
+        console.error('退出清理失败', e);
+      }
+      const headers = new Headers({ Location: '/' });
+      headers.append('Set-Cookie', buildSessionCookie('', { maxAge: 0 }));
+      headers.append('Set-Cookie', buildGateCookie('', 0));
+      return new Response(null, { status: 302, headers });
+    }
+
     if (path === '/admin' || path === '/admin/logout' || path.startsWith('/static')) {
       // 已过整站密码门即等同管理员（fork 调整，用户要求免二次登录）：
       // 没有管理员会话时自动签发一个，并把 Cookie 写回浏览器，后续请求自然带上。
+      // 自动签发任何一步失败都回退到上游登录页，绝不让异常冒成 1101。
       if (path !== '/admin/logout'
         && await validateGateSession(request, env)
         && !(await isAdminAuthenticated(request, env))) {
-        const token = await createAdminSession(env);
-        const headers = new Headers(request.headers);
-        const cookie = headers.get('Cookie') || '';
-        headers.set('Cookie', (cookie ? cookie + '; ' : '') + SESSION_COOKIE_NAME + '=' + token);
-        const res = await handleAdminRequest(new Request(request, { headers }), env, ctx);
-        const out = new Response(res.body, res);
-        out.headers.append('Set-Cookie', buildSessionCookie(token));
-        return out;
+        try {
+          const token = await createAdminSession(env);
+          const headers = new Headers(request.headers);
+          const cookie = headers.get('Cookie') || '';
+          headers.set('Cookie', (cookie ? cookie + '; ' : '') + SESSION_COOKIE_NAME + '=' + token);
+          const res = await handleAdminRequest(new Request(request, { headers }), env, ctx);
+          const out = new Response(res.body, res);
+          out.headers.append('Set-Cookie', buildSessionCookie(token));
+          return out;
+        } catch (e) {
+          console.error('自动签发管理员会话失败，回退登录页', e);
+        }
       }
       return handleAdminRequest(request, env, ctx);
     }

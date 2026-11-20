@@ -192,6 +192,33 @@ body[data-view="card"] .app-title { font-size: 14px; font-weight: 600; color: va
 body[data-view="card"] .app-desc { font-size: 12px; color: var(--ink-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 body[data-view="card"] .app-domain { font-size: 11px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* 悬浮设置窗（像真实系统里的应用窗口：玻璃边框 + 标题栏拖动 + 红点关闭） */
+.settings-window {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(1080px, 94vw); height: min(720px, 88dvh); z-index: 90;
+  border-radius: 22px; overflow: hidden; display: flex; flex-direction: column;
+}
+.settings-window[hidden] { display: none; }
+.settings-window.opening { animation: swIn .22s var(--ease-out); }
+@keyframes swIn { from { opacity: 0; transform: translate(-50%, -50%) scale(.965); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.settings-window.dragged { transform: none; }
+.sw-bar {
+  position: relative; z-index: 1; height: 42px; flex: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 14px; border-bottom: 1px solid rgb(255 255 255 / 8%);
+  cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none;
+}
+.sw-bar:active { cursor: grabbing; }
+.traffic-lights { display: flex; gap: 8px; align-items: center; width: 60px; }
+.tl { width: 12px; height: 12px; border-radius: 50%; border: none; padding: 0; display: inline-block; }
+button.tl-close { background: #ff5f57; cursor: pointer; box-shadow: inset 0 0 2px rgb(0 0 0 / 25%); }
+button.tl-close:hover { filter: brightness(1.1); }
+.tl-min { background: #febc2e; }
+.tl-max { background: #28c840; }
+.sw-title { font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: .02em; }
+.sw-spacer { width: 60px; }
+.settings-window iframe { position: relative; z-index: 1; flex: 1; width: 100%; border: 0; background: transparent; }
+
 /* 壁纸设置小面板 */
 .wp-pop { position: fixed; top: 44px; right: 14px; z-index: 80; width: 218px; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
 .wp-pop[hidden] { display: none; }
@@ -221,7 +248,7 @@ body[data-view="card"] .app-domain { font-size: 11px; color: var(--ink-3); white
   <span class="brand">星境</span>
   {{MENU_ITEMS}}
   <span class="spacer"></span>
-  <button type="button" class="menu-item" id="wpBtn">壁纸</button>
+  <button type="button" class="menu-item" id="wpBtn">换壁纸</button>
   <span class="view-toggle" role="group" aria-label="显示模式">
     <button type="button" id="viewIcon" class="active">图标</button><button type="button" id="viewCard">卡片</button>
   </span>
@@ -265,6 +292,19 @@ body[data-view="card"] .app-domain { font-size: 11px; color: var(--ink-3); white
 </main>
 
 <nav class="dots" id="dots">{{DOTS}}</nav>
+
+<div class="settings-window glass" id="settingsWindow" hidden role="dialog" aria-label="设置">
+  <div class="sw-bar" id="swBar">
+    <div class="traffic-lights">
+      <button type="button" class="tl tl-close" id="swClose" aria-label="关闭设置"></button>
+      <span class="tl tl-min" aria-hidden="true"></span>
+      <span class="tl tl-max" aria-hidden="true"></span>
+    </div>
+    <span class="sw-title">设置</span>
+    <span class="sw-spacer" aria-hidden="true"></span>
+  </div>
+  <iframe id="settingsFrame" title="星境设置" src="about:blank"></iframe>
+</div>
 
 <div class="dock-wrap">
   <div class="dock glass" id="dock">
@@ -378,6 +418,47 @@ note.addEventListener('input', function () {
     catch (e) { noteState.textContent = '保存失败'; }
   }, 400);
 });
+
+// 悬浮设置窗：点 Dock 齿轮在桌面上开窗（内嵌 /admin?embed=1），红点关闭，标题栏可拖动。
+var settingsWindow = document.getElementById('settingsWindow');
+var settingsFrame = document.getElementById('settingsFrame');
+var swBar = document.getElementById('swBar');
+function openSettings() {
+  settingsFrame.src = '/admin?embed=1';
+  settingsWindow.hidden = false;
+  settingsWindow.classList.remove('opening');
+  void settingsWindow.offsetWidth;
+  settingsWindow.classList.add('opening');
+}
+function closeSettings() {
+  settingsWindow.hidden = true;
+  settingsFrame.src = 'about:blank';
+}
+document.addEventListener('click', function (e) {
+  var gear = e.target.closest ? e.target.closest('.dock-app[href="/admin"]') : null;
+  if (gear) { e.preventDefault(); openSettings(); }
+});
+document.getElementById('swClose').addEventListener('click', closeSettings);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !settingsWindow.hidden) closeSettings(); });
+(function () {
+  var drag = null;
+  swBar.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('.tl-close')) return;
+    var r = settingsWindow.getBoundingClientRect();
+    settingsWindow.classList.add('dragged');
+    settingsWindow.style.left = r.left + 'px';
+    settingsWindow.style.top = r.top + 'px';
+    drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    swBar.setPointerCapture(e.pointerId);
+  });
+  swBar.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    settingsWindow.style.left = Math.min(Math.max(e.clientX - drag.dx, -settingsWindow.offsetWidth + 120), window.innerWidth - 120) + 'px';
+    settingsWindow.style.top = Math.min(Math.max(e.clientY - drag.dy, 0), window.innerHeight - 60) + 'px';
+  });
+  swBar.addEventListener('pointerup', function () { drag = null; });
+  swBar.addEventListener('pointercancel', function () { drag = null; });
+})();
 
 // 自定义壁纸：上传（浏览器内先压缩）→ 存服务器 KV；恢复默认走 DELETE。
 var wpBtn = document.getElementById('wpBtn');

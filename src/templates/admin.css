@@ -1222,3 +1222,35 @@ html.dark .modal-content {
   .sidebar-footer { margin: 0; }
   .settings-main { padding: 12px; }
 }
+
+/* ===== 设置页统一化（fork 追加二）：选中态修正 + 分组卡行式表单 ===== */
+html.dark .settings-sidebar .tab-button.active { background: rgb(255 255 255 / 13%); color: #fff; }
+html.dark .sb-meta { color: #aeb4c0; }
+html.dark .settings-wrapper { padding: 4px 2px; }
+html.dark .settings-card {
+  max-width: 660px; padding: 18px 22px 20px; border-radius: 18px;
+  background: rgb(255 255 255 / 5%); border: 1px solid rgb(255 255 255 / 10%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+html.dark .settings-title { font-size: 15px; font-weight: 600; color: #f4f5f7; margin: 0 0 6px; }
+html.dark .settings-field {
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 0; border-bottom: 1px solid rgb(255 255 255 / 7%); margin: 0;
+}
+html.dark .settings-field label { flex: none; width: 92px; margin: 0; color: #c6c9d1; font-size: 13px; }
+html.dark .settings-card input[type="text"], html.dark .settings-card select {
+  flex: 1; min-width: 0; height: 36px; border-radius: 10px;
+  background: rgb(255 255 255 / 7%); border: 1px solid rgb(255 255 255 / 12%); color: #f4f5f7;
+}
+html.dark .settings-actions { padding-top: 16px; margin: 0; }
+html.dark .settings-actions .btn-primary-action { border-radius: 10px; height: 36px; padding: 0 18px; }
+html.dark .add-new { border-radius: 18px; }
+html.dark .modal-content { border-radius: 18px; }
+
+/* ===== 嵌入模式（fork 追加）：作为前台桌面的悬浮窗内容，去掉自带窗口外壳 ===== */
+html.embed body { padding: 0 !important; background: transparent !important; }
+html.embed .container {
+  width: 100%; height: 100vh; border-radius: 0; border: none; box-shadow: none;
+  background: rgb(22 25 32 / 42%);
+}
+html.embed .windowbar { display: none; }

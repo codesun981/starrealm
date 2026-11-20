@@ -87,7 +87,7 @@ export async function handleFrontendRequest(request, env, ctx) {
     FIRST_DESKTOP: escapeHTML(catalogs[0] || '星境'),
   });
 
-  return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+  return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
 
 // 单个桌面图标：优先站点自带 logo，其次 apple-touch-icon / favicon，失败回退首字色块。

@@ -11,7 +11,7 @@ export function renderAdminPage() {
     `<style>${adminCss}</style>`
   );
   return new Response(html, {
-    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
   });
 }
 
@@ -19,7 +19,7 @@ export function renderAdminPage() {
 export function renderLoginPage(message = '') {
   if (!message) {
     return new Response(loginHtml, {
-      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
     });
   }
   // 登录失败时注入已转义的中文提示。
@@ -29,7 +29,7 @@ export function renderLoginPage(message = '') {
     `<div class="error-message" style="display:block;">${safeMessage}</div>`
   );
   return new Response(html, {
-    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
   });
 }
 

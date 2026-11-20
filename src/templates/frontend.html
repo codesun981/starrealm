@@ -195,7 +195,7 @@ body[data-view="card"] .app-domain { font-size: 11px; color: var(--ink-3); white
 /* 悬浮设置窗（像真实系统里的应用窗口：玻璃边框 + 标题栏拖动 + 红点关闭） */
 .settings-window {
   position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: min(1080px, 94vw); height: min(720px, 88dvh); z-index: 90;
+  width: min(1180px, 96vw); height: min(740px, 88dvh); z-index: 90;
   border-radius: 22px; overflow: hidden; display: flex; flex-direction: column;
 }
 .settings-window[hidden] { display: none; }
@@ -248,20 +248,12 @@ button.tl-close:hover { filter: brightness(1.1); }
   <span class="brand">星境</span>
   {{MENU_ITEMS}}
   <span class="spacer"></span>
-  <button type="button" class="menu-item" id="wpBtn">换壁纸</button>
   <span class="view-toggle" role="group" aria-label="显示模式">
     <button type="button" id="viewIcon" class="active">图标</button><button type="button" id="viewCard">卡片</button>
   </span>
   <span class="meta"><span class="dim" id="menuDate"></span><span id="menuClock"></span></span>
 </header>
 
-<div class="wp-pop glass" id="wpPop" hidden>
-  <p class="wp-title">桌面壁纸</p>
-  <button type="button" id="wpUploadBtn">上传图片…</button>
-  <button type="button" id="wpResetBtn">恢复默认壁纸</button>
-  <p class="wp-hint" id="wpHint">JPG / PNG / WebP，上传时自动压缩</p>
-</div>
-<input type="file" id="wpFile" accept="image/jpeg,image/png,image/webp,image/avif" hidden>
 
 <div class="island" role="search">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M20 20l-3.8-3.8"/></svg>
@@ -433,6 +425,7 @@ function openSettings() {
 function closeSettings() {
   settingsWindow.hidden = true;
   settingsFrame.src = 'about:blank';
+  applyWallpaper();
 }
 document.addEventListener('click', function (e) {
   var gear = e.target.closest ? e.target.closest('.dock-app[href="/admin"]') : null;
@@ -467,48 +460,9 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !s
   swBar.addEventListener('pointercancel', function () { drag = null; });
 })();
 
-// 自定义壁纸：上传（浏览器内先压缩）→ 存服务器 KV；恢复默认走 DELETE。
-var wpBtn = document.getElementById('wpBtn');
-var wpPop = document.getElementById('wpPop');
-var wpFile = document.getElementById('wpFile');
-var wpHint = document.getElementById('wpHint');
-wpBtn.addEventListener('click', function (e) { e.stopPropagation(); wpPop.hidden = !wpPop.hidden; });
-document.addEventListener('click', function (e) { if (!wpPop.hidden && !wpPop.contains(e.target)) wpPop.hidden = true; });
 function applyWallpaper() {
   document.body.style.backgroundImage = "url('/wallpaper.jpg?t=" + Date.now() + "')";
 }
-function shrinkImage(file) {
-  return createImageBitmap(file).then(function (bmp) {
-    var scale = Math.min(1, 2560 / bmp.width);
-    if (scale >= 1 && file.size < 1500000) return file;
-    var canvas = document.createElement('canvas');
-    canvas.width = Math.round(bmp.width * scale); canvas.height = Math.round(bmp.height * scale);
-    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
-    return new Promise(function (res) { canvas.toBlob(function (b) { res(b || file); }, 'image/jpeg', 0.82); });
-  }).catch(function () { return file; });
-}
-document.getElementById('wpUploadBtn').addEventListener('click', function () { wpFile.click(); });
-wpFile.addEventListener('change', function () {
-  var file = wpFile.files && wpFile.files[0];
-  if (!file) return;
-  wpHint.textContent = '上传中…';
-  shrinkImage(file).then(function (blob) {
-    return fetch('/api/wallpaper', { method: 'POST', headers: { 'Content-Type': blob.type || 'image/jpeg' }, body: blob });
-  }).then(function (r) {
-    if (!r.ok) throw new Error('bad');
-    wpHint.textContent = '已更新，所有设备打开都是这张';
-    applyWallpaper();
-  }).catch(function () { wpHint.textContent = '上传失败，换张图试试'; });
-  wpFile.value = '';
-});
-document.getElementById('wpResetBtn').addEventListener('click', function () {
-  wpHint.textContent = '恢复中…';
-  fetch('/api/wallpaper', { method: 'DELETE' }).then(function (r) {
-    if (!r.ok) throw new Error('bad');
-    wpHint.textContent = '已恢复默认壁纸';
-    applyWallpaper();
-  }).catch(function () { wpHint.textContent = '恢复失败'; });
-});
 
 // 显示模式（图标/卡片），本地记住选择
 var viewIconBtn = document.getElementById('viewIcon');

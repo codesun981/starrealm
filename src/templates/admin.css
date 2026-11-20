@@ -1260,3 +1260,26 @@ html.embed .container { background: rgb(16 18 24 / 68%); }
 html.embed .settings-sidebar { background: rgb(0 0 0 / 22%); }
 html.embed .settings-sidebar .tab-button { color: #e8eaf0; }
 html.embed .table-wrapper { background: rgb(10 12 16 / 34%); }
+
+/* ===== 外观分区 + 对比度再加深（fork 追加三） ===== */
+.wp-preview { width: 100%; max-height: 300px; object-fit: cover; border-radius: 12px; border: 1px solid rgb(255 255 255 / 12%); display: block; margin: 8px 0 12px; }
+.wp-actions { display: flex; gap: 8px; align-items: center; }
+.wp-actions .btn-primary-action { border-radius: 10px; height: 36px; padding: 0 16px; }
+.wp-note { margin: 12px 0 0; font-size: 12px; line-height: 1.6; color: #9aa0ae; }
+html.embed .container { background: rgb(13 15 20 / 80%); }
+html.embed .settings-sidebar { background: rgb(0 0 0 / 30%); }
+html.embed .table-wrapper { background: rgb(8 10 14 / 46%); }
+html.dark .container { background: rgb(22 25 32 / 62%); }
+
+/* ===== 嵌入模式表格收紧（fork 追加四）：列宽重排，操作列完整可见 ===== */
+html.embed .settings-sidebar { width: 198px; }
+html.embed .settings-main { padding: 14px 16px; }
+html.embed #configTable th:nth-child(1), html.embed #pendingTable th:nth-child(1) { width: 50px !important; }
+html.embed #configTable th:nth-child(2), html.embed #pendingTable th:nth-child(2) { width: 148px !important; }
+html.embed #configTable th:nth-child(3), html.embed #pendingTable th:nth-child(3) { width: 184px !important; }
+html.embed #configTable th:nth-child(4), html.embed #pendingTable th:nth-child(4) { width: 50px !important; }
+html.embed #configTable th:nth-child(6) { width: 100px !important; }
+html.embed #configTable th:nth-child(7) { width: 62px !important; }
+html.embed #configTable th:nth-child(8) { width: 128px !important; }
+html.embed #pendingTable th:nth-child(6) { width: 100px !important; }
+html.embed #pendingTable th:nth-child(7) { width: 132px !important; }

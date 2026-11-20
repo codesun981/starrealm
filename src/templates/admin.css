@@ -1341,3 +1341,14 @@ html.dark .windowbar-title { font-size: 12px; font-weight: 600; color: rgb(255 2
 .bm-side { display: flex; align-items: center; gap: 6px; flex: none; }
 .bm-pagination { margin-top: 14px; background: transparent; border-top: none; }
 .bm-empty { padding: 34px 0; text-align: center; font-size: 12.5px; color: #8f939e; }
+
+/* ===== 对齐补强（fork 追加九）：选中项蓝染压过旧规则、设置表单改行式 ===== */
+html.dark .settings-sidebar .tab-button.active { background: rgb(10 132 255 / 20%); color: #fff; }
+html.dark .settings-sidebar .tab-button.active svg { color: #64b5ff; }
+html.dark .settings-card { max-width: none; }
+html.dark .settings-form { display: flex; flex-direction: column; }
+html.dark .settings-field { flex-direction: row; align-items: center; gap: 16px; padding: 11px 0; border-bottom: 1px solid rgb(255 255 255 / 7%); }
+html.dark .settings-field label { width: 150px; flex: none; font-size: 12.5px; font-weight: 540; color: #f4f5f7; text-align: left; }
+html.dark .settings-field select { width: 170px; flex: none; margin-left: auto; }
+html.dark .settings-field input { flex: 1; min-width: 0; }
+html.dark .settings-actions { margin-top: 14px; display: flex; justify-content: flex-end; }
